@@ -101,7 +101,7 @@ def main():
                 phase = 1
 
         if phase == 1:
-            misson_time = (ticks_ms() - ini_mission_time)/1000
+            mission_time = (ticks_ms() - ini_mission_time)/1000
             led.value(1)
             sleep(2)
             led.value(0)
