@@ -54,6 +54,7 @@ def function():
     IN2.value(0)
     sleep(0.5)
     print(2)
+    sleep(1)
     IN1.value(0)
     IN2.value(1)
     sleep(10)
