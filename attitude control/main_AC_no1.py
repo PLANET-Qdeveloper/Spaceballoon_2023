@@ -7,13 +7,14 @@ from bno055 import BNO055
 import sdcard
 
 #PID制御関連の定数
-max_u = 450
+max_u = 3
+max_vol = 7
 I_cyc = 0.000169625  #円盤の慣性モーメント[]
 I_pay = 0.023476105  #ペーロードの慣性モーメント[]
 T = 0.005   #PID制御の周期[s]
-KP = 2.3
+KP = 0.8
 KD = 0
-KI = 0.5
+KI = 0
 ie = 0
 e_pre = 0
 
@@ -37,7 +38,7 @@ try:
 except:
     pass
 
-'''
+
 cs = Pin(17, Pin.OUT)    #SDカード
 spi = SPI(0, baudrate=32000000, sck=Pin(18), mosi=Pin(19), miso=Pin(16))
 
@@ -84,24 +85,24 @@ def record(t):
     
     
 record_timer.init(period=1000, callback=record)
-'''
+
 
 def rotation(duty):
     global pre_duty
-    per = abs(int(duty))
+    per = abs(duty)
     
     if pre_duty * duty <= 0:
         IN1.duty_u16(65535)
         IN2.duty_u16(65535)
         sleep(2)
     if duty >= 0:
-        IN1.duty_u16(per*65535)
+        IN1.duty_u16(int(per*65535))
         IN2.duty_u16(0)
         CW.value(1)
         CCW.value(0)
     if duty < 0:
         IN1.duty_u16(0)
-        IN2.duty_u16(per*65535)
+        IN2.duty_u16(int(per*65535))
         CW.value(0)
         CCW.value(1)
         
@@ -109,7 +110,7 @@ def rotation(duty):
 
 '''
 電圧と回転数の関係．
-今回は線形と仮定して，0Vで0rad/s，12Vで7410*2π/60[rad/s]とした．
+今回は線形と仮定して，0Vで0[rad/s]，12Vで7410*2π/60[rad/s]とした．
 出力は11.1Vに対する比．
 範囲は+-1.
 
@@ -119,7 +120,7 @@ duty比が小さすぎるとモーターが動かない．．．
 '''
 def convert(ang):
     vol = 12/247/math.pi*ang
-    ratio = vol/7.0
+    ratio = vol/max_vol
     return ratio
 
 
@@ -155,18 +156,3 @@ def main():
 
 if __name__=='__main__':
     main()
-    
-    '''
-    for i in range(11):
-        pre = i*0.1
-        print(pre)
-        IN1.duty_u16(int(pre*65535))
-        IN2.duty_u16(0)
-        utime.sleep(5)
-    
-    IN1.duty_u16(65535)
-    IN2.duty_u16(0)
-    utime.sleep(5)
-    IN1.duty_u16(0)
-    IN2.duty_u16(0)
-    '''
